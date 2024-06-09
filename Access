@@ -100,3 +100,54 @@ Private Sub SeuBotao_Click()
     ' Confirmação de que os dados foram inseridos
     MsgBox "Dados inseridos com sucesso!", vbInformation
 End Sub
+
+
+----
+
+
+Para criar uma tabela no Excel que cruze dados das tabelas de Informações e Funcionário do Access e inclua a funcionalidade de rastrear as leituras, você pode seguir estes passos:
+
+Crie a Tabela de Leitura no Access:
+Esta tabela deve ter pelo menos três campos: um ID de leitura (chave primária), o ID da informação (chave estrangeira da tabela Informações) e o código do funcionário (chave estrangeira da tabela Funcionário).
+Exemplo de campos: LeituraID, InfoID, CodigoFuncionario.
+Estabeleça Relacionamentos no Access:
+Relacione a tabela Leitura com a tabela Informações pelo campo InfoID.
+Relacione a tabela Leitura com a tabela Funcionário pelo campo CodigoFuncionario.
+Importe as Tabelas para o Excel:
+No Excel, use a funcionalidade de conexão de dados para importar as tabelas do Access.
+Na guia “Dados”, escolha “Obter Dados Externos” e selecione “Do Access” para conectar-se ao seu banco de dados e importar as tabelas.
+Crie Relacionamentos no Excel:
+No Excel, você pode criar relações entre as tabelas importadas usando o Modelo de Dados.
+Vá para “Gerenciador de Relações” e estabeleça relações entre as tabelas conforme os relacionamentos no Access.
+Use Tabela Dinâmica para Cruzar os Dados:
+Insira uma Tabela Dinâmica.
+Adicione os campos da tabela Informações às Linhas ou Colunas.
+Adicione os campos da tabela Funcionário às Linhas ou Colunas.
+Use o campo LeituraID para determinar se uma informação foi lida ou não.
+Calcule a Leitura ou Não Leitura:
+Você pode adicionar uma coluna calculada na Tabela Dinâmica para verificar se uma informação foi lida por um funcionário.
+Use uma fórmula como =SE(ÉERROS(PROCV(CodigoFuncionario; Leitura; ColunaLeituraID; FALSO)); "Não Lida"; "Lida").
+Atualize a Tabela Dinâmica:
+Atualize a Tabela Dinâmica sempre que novos dados forem inseridos nas tabelas do Access para refletir as leituras mais recentes.
+Aqui está um exemplo de código VBA que pode ajudar a automatizar a inserção de dados na tabela Leitura quando um funcionário lê uma informação:
+
+Sub RegistrarLeitura(InfoID As Long, CodigoFuncionario As String)
+    Dim conn As Object
+    Dim strSQL As String
+    
+    ' Cria a conexão com o banco de dados Access
+    Set conn = CreateObject("ADODB.Connection")
+    conn.Open "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=CaminhoDoSeuBancoDeDados.accdb"
+    
+    ' SQL para inserir um registro de leitura
+    strSQL = "INSERT INTO Leitura (InfoID, CodigoFuncionario) VALUES (" & InfoID & ", '" & CodigoFuncionario & "')"
+    
+    ' Executa o comando SQL
+    conn.Execute strSQL
+    
+    ' Fecha a conexão
+    conn.Close
+    Set conn = Nothing
+End Sub
+
+Este script VBA pode ser associado a um botão no formulário do Excel, permitindo que os funcionários registrem leituras com um clique
