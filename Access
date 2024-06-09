@@ -1,0 +1,34 @@
+Function TentarGravarNoAccess(retries As Integer, delay As Integer) As Boolean
+    Dim conn As Object
+    Dim isLocked As Boolean
+    Dim attempts As Integer
+    
+    Set conn = CreateObject("ADODB.Connection")
+    conn.Open "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\caminho\bancoDeDados.accdb"
+    
+    Do
+        isLocked = False
+        On Error Resume Next
+        ' Tente executar uma operação de gravação
+        conn.Execute "INSERT INTO Tabela (Campo) VALUES ('Valor')"
+        If Err.Number <> 0 Then
+            ' Erro ocorreu, possivelmente devido a bloqueio
+            isLocked = True
+            attempts = attempts + 1
+            ' Aguarde um pouco antes de tentar novamente
+            Application.Wait (Now + TimeValue("0:00:" & delay))
+        End If
+        On Error GoTo 0
+    Loop While isLocked And attempts < retries
+    
+    If isLocked Then
+        ' Não foi possível gravar após várias tentativas
+        TentarGravarNoAccess = False
+    Else
+        ' Gravação bem-sucedida
+        TentarGravarNoAccess = True
+    End If
+    
+    conn.Close
+    Set conn = Nothing
+End Function
